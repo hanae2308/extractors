@@ -132,9 +132,38 @@
       color: #2563eb;
       font-size: 14px;
     }
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.8);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      display: none;
+    }
+    .spinner {
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
   </style>
 </head>
 <body>
+  <div class="loading">
+    <div class="spinner"></div>
+  </div>
+
   <h1>Extractors</h1>
 
   <div class="tool-grid">
@@ -147,7 +176,7 @@
       </div>
       <div class="tool-card-body">
         <h3>IP and ID Extractor</h3>
-        <p> IPs by associated IDs.</p>
+        <p>Extract IPs by associated IDs.</p>
         <button class="use-tool-button" onclick="showTool('ipIdTool')">
           Use Tool
         </button>
@@ -162,7 +191,7 @@
       </div>
       <div class="tool-card-body">
         <h3>IP Address Extractor</h3>
-        <p>Extract all IPs addresses.</p>
+        <p>Extract all IP addresses.</p>
         <button class="use-tool-button" onclick="showTool('ipTool')">
           Use Tool
         </button>
@@ -192,7 +221,7 @@
       </div>
       <div class="tool-card-body">
         <h3>Domain-IP</h3>
-        <p>Extract  IPs by domain.</p>
+        <p>Extract IPs by domain.</p>
         <button class="use-tool-button" onclick="showTool('domainIpTool')">
           Use Tool
         </button>
@@ -204,10 +233,11 @@
     <div class="back-link" onclick="hideAll()">← Back to Tools</div>
     <h3>IP and ID Extractor</h3>
     <div class="textarea-group">
-      <textarea id="inputIpId"></textarea>
-      <textarea id="outputIpId" readonly></textarea>
+      <textarea id="inputIpId" placeholder="Paste text containing IPs and IDs here..."></textarea>
+      <textarea id="outputIpId" readonly placeholder="Results will appear here..."></textarea>
     </div>
     <div class="button-row">
+      <button onclick="processIpIdExtraction()">Process</button>
       <button onclick="copyOutput('outputIpId')">Copy Output</button>
       <button onclick="clearFields('ipIdTool')">Clear All</button>
     </div>
@@ -217,10 +247,11 @@
     <div class="back-link" onclick="hideAll()">← Back to Tools</div>
     <h3>IP Extractor</h3>
     <div class="textarea-group">
-      <textarea id="inputIP"></textarea>
-      <textarea id="outputIP" readonly></textarea>
+      <textarea id="inputIP" placeholder="Paste text containing IP addresses here..."></textarea>
+      <textarea id="outputIP" readonly placeholder="Extracted IPs will appear here..."></textarea>
     </div>
     <div class="button-row">
+      <button onclick="processIpExtraction()">Process</button>
       <button onclick="copyOutput('outputIP')">Copy Output</button>
       <button onclick="clearFields('ipTool')">Clear All</button>
     </div>
@@ -230,10 +261,11 @@
     <div class="back-link" onclick="hideAll()">← Back to Tools</div>
     <h3>Domain Extractor</h3>
     <div class="textarea-group">
-      <textarea id="inputDomain"></textarea>
-      <textarea id="outputDomain" readonly></textarea>
+      <textarea id="inputDomain" placeholder="Paste text containing domains here..."></textarea>
+      <textarea id="outputDomain" readonly placeholder="Extracted domains will appear here..."></textarea>
     </div>
     <div class="button-row">
+      <button onclick="processDomainExtraction()">Process</button>
       <button onclick="copyOutput('outputDomain')">Copy Output</button>
       <button onclick="clearFields('domainTool')">Clear All</button>
     </div>
@@ -241,22 +273,27 @@
 
   <div id="domainIpTool" class="tool-section">
     <div class="back-link" onclick="hideAll()">← Back to Tools</div>
-    <h3>Domain-IP </h3>
+    <h3>Domain-IP Extractor</h3>
     <div class="textarea-group">
-      <textarea id="inputDomainIP"></textarea>
-      <textarea id="outputDomainIP" readonly></textarea>
+      <textarea id="inputDomainIP" placeholder="Paste text with domain-IP associations here..."></textarea>
+      <textarea id="outputDomainIP" readonly placeholder="Domain-IP associations will appear here..."></textarea>
     </div>
     <div class="button-row">
+      <button onclick="processDomainIpExtraction()">Process</button>
       <button onclick="copyOutput('outputDomainIP')">Copy Output</button>
       <button onclick="clearFields('domainIpTool')">Clear All</button>
     </div>
   </div>
 
   <script>
+    // Utility functions
+    function showLoading(show) {
+      document.querySelector('.loading').style.display = show ? 'flex' : 'none';
+    }
+
     function hideAll() {
       document.querySelectorAll(".tool-section").forEach((el) => {
         el.style.display = "none";
-        el.querySelectorAll("textarea").forEach((t) => (t.value = ""));
       });
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -267,78 +304,20 @@
       document.getElementById(id).scrollIntoView({ behavior: "smooth" });
     }
 
-    document.getElementById("inputIpId").addEventListener("input", () => {
-      const text = document.getElementById("inputIpId").value;
-      const pattern = /\b(\d{1,3}(?:\.\d{1,3}){3})\s+(\d{6,})/g;
-      const map = {};
-      let match;
-      while ((match = pattern.exec(text)) !== null) {
-        const [_, ip, id] = match;
-        if (!map[id]) map[id] = new Set();
-        map[id].add(ip);
-      }
-      let result = "";
-      for (const id in map) {
-        result += id + "\n" + [...map[id]].join("\n") + "\n\n";
-      }
-      document.getElementById("outputIpId").value = result.trim();
-    });
-
-    document.getElementById("inputIP").addEventListener("input", () => {
-      const text = document.getElementById("inputIP").value;
-      const ipPattern = /\b\d{1,3}(?:\.\d{1,3}){3}\b/g;
-      const matches = text.match(ipPattern);
-      document.getElementById("outputIP").value = matches
-        ? [...new Set(matches)].join("\n")
-        : "";
-    });
-
-    document.getElementById("inputDomain").addEventListener("input", () => {
-      const text = document.getElementById("inputDomain").value;
-      const domainPattern = /\b(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}\b/g;
-      const matches = text.match(domainPattern);
-      document.getElementById("outputDomain").value = matches
-        ? [...new Set(matches)].join("\n")
-        : "";
-    });
-
-    document.getElementById("inputDomainIP").addEventListener("input", () => {
-      const text = document.getElementById("inputDomainIP").value;
-      const lines = text.split(/\r?\n/);
-      let result = "";
-      let group = [];
-      for (const line of lines) {
-        const ipMatch = line.match(/\b\d{1,3}(?:\.\d{1,3}){3}\b/);
-        if (ipMatch) {
-          group.push(ipMatch[0]);
-        } else if (line.trim().toLowerCase() === "domain") {
-          if (group.length > 0) {
-            result += "domain\n" + group.join("\n") + "\n\n";
-            group = [];
-          }
-        }
-      }
-      if (group.length > 0) {
-        result += "domain\n" + group.join("\n");
-      }
-      document.getElementById("outputDomainIP").value = result.trim();
-    });
-
     function copyOutput(outputId) {
       const output = document.getElementById(outputId);
-      if (!output.value) return; // silently ignore empty output
+      if (!output.value) return;
+      
       navigator.clipboard.writeText(output.value).then(() => {
-        const button = document
-          .getElementById(outputId)
-          .parentElement.nextElementSibling.querySelector("button:first-child");
-        if (!button) return;
-        const originalText = button.textContent;
-        button.textContent = "Copied!";
-        button.disabled = true;
-        setTimeout(() => {
-          button.textContent = originalText;
-          button.disabled = false;
-        }, 1500);
+        const buttons = document.querySelectorAll(`#${outputId}`).parentElement.nextElementSibling.querySelectorAll("button");
+        if (buttons.length > 1) {
+          const copyButton = buttons[1];
+          const originalText = copyButton.textContent;
+          copyButton.textContent = "Copied!";
+          setTimeout(() => {
+            copyButton.textContent = originalText;
+          }, 1500);
+        }
       });
     }
 
@@ -347,6 +326,91 @@
       if (!section) return;
       section.querySelectorAll("textarea").forEach((t) => (t.value = ""));
     }
+
+    // Processing functions with optimizations
+    function processIpIdExtraction() {
+      showLoading(true);
+      setTimeout(() => {
+        const text = document.getElementById("inputIpId").value;
+        const pattern = /\b(\d{1,3}(?:\.\d{1,3}){3})\s+(\d{6,})/g;
+        const map = {};
+        let match;
+        
+        while ((match = pattern.exec(text)) !== null) {
+          const [_, ip, id] = match;
+          if (!map[id]) map[id] = new Set();
+          map[id].add(ip);
+        }
+        
+        let result = "";
+        for (const id in map) {
+          result += id + "\n" + [...map[id]].join("\n") + "\n\n";
+        }
+        
+        document.getElementById("outputIpId").value = result.trim();
+        showLoading(false);
+      }, 50);
+    }
+
+    function processIpExtraction() {
+      showLoading(true);
+      setTimeout(() => {
+        const text = document.getElementById("inputIP").value;
+        const ipPattern = /\b\d{1,3}(?:\.\d{1,3}){3}\b/g;
+        const matches = text.match(ipPattern);
+        document.getElementById("outputIP").value = matches
+          ? [...new Set(matches)].join("\n")
+          : "";
+        showLoading(false);
+      }, 50);
+    }
+
+    function processDomainExtraction() {
+      showLoading(true);
+      setTimeout(() => {
+        const text = document.getElementById("inputDomain").value;
+        const domainPattern = /\b(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}\b/g;
+        const matches = text.match(domainPattern);
+        document.getElementById("outputDomain").value = matches
+          ? [...new Set(matches)].join("\n")
+          : "";
+        showLoading(false);
+      }, 50);
+    }
+
+    function processDomainIpExtraction() {
+      showLoading(true);
+      setTimeout(() => {
+        const text = document.getElementById("inputDomainIP").value;
+        const lines = text.split(/\r?\n/);
+        let result = "";
+        let group = [];
+        
+        for (const line of lines) {
+          const ipMatch = line.match(/\b\d{1,3}(?:\.\d{1,3}){3}\b/);
+          if (ipMatch) {
+            group.push(ipMatch[0]);
+          } else if (line.trim().toLowerCase() === "domain") {
+            if (group.length > 0) {
+              result += "domain\n" + group.join("\n") + "\n\n";
+              group = [];
+            }
+          }
+        }
+        
+        if (group.length > 0) {
+          result += "domain\n" + group.join("\n");
+        }
+        
+        document.getElementById("outputDomainIP").value = result.trim();
+        showLoading(false);
+      }, 50);
+    }
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+      hideAll();
+    });
   </script>
 </body>
 </html>
