@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Extractions</title>
+  <link
+    rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Segoe+UI&display=swap"
+  />
+  <script
+    src="https://kit.fontawesome.com/a076d05399.js"
+    crossorigin="anonymous"
+  ></script>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: #f4f7fb;
+      margin: 0;
+      padding: 20px;
+    }
+    h1,
+    h2,
+    h3 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .tool-grid {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 25px;
+      margin-bottom: 40px;
+    }
+    .tool-card {
+      background: #fff;
+      border-radius: 15px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+      overflow: hidden;
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.3s ease;
+    }
+    .tool-card:hover {
+      transform: translateY(-5px);
+    }
+    .tool-card-header {
+      width: 100%;
+      height: 100px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+    }
+    .tool-card-body {
+      padding: 20px;
+      text-align: center;
+    }
+    .tool-card-body h3 {
+      margin: 0;
+      font-size: 18px;
+    }
+    .tool-card-body p {
+      font-size: 14px;
+      color: #666;
+      margin: 10px 0;
+    }
+    .use-tool-button {
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 14px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .use-tool-button:hover {
+      background-color: #2563eb;
+    }
+    .tool-section {
+      display: none;
+      max-width: 1000px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    .textarea-group {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+    }
+    textarea {
+      width: 100%;
+      height: 200px;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-family: monospace;
+      resize: none;
+    }
+    .button-row {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+    }
+    .button-row button {
+      padding: 8px 15px;
+      border: none;
+      background-color: #2563eb;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .button-row button:hover {
+      background-color: #1d4ed8;
+    }
+    .back-link {
+      margin-bottom: 10px;
+      display: inline-block;
+      cursor: pointer;
+      color: #2563eb;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Extractors</h1>
+
+  <div class="tool-grid">
+    <div class="tool-card">
+      <div
+        class="tool-card-header"
+        style="background: linear-gradient(45deg, #3f87a6, #ebf8e1)"
+      >
+        <i class="tool-icon fas fa-network-wired"></i>
+      </div>
+      <div class="tool-card-body">
+        <h3>IP and ID Extractor</h3>
+        <p> IPs by associated IDs.</p>
+        <button class="use-tool-button" onclick="showTool('ipIdTool')">
+          Use Tool
+        </button>
+      </div>
+    </div>
+    <div class="tool-card">
+      <div
+        class="tool-card-header"
+        style="background: linear-gradient(45deg, #00c6ff, #0072ff)"
+      >
+        <i class="tool-icon fas fa-globe"></i>
+      </div>
+      <div class="tool-card-body">
+        <h3>IP Address Extractor</h3>
+        <p>Extract all IPs addresses.</p>
+        <button class="use-tool-button" onclick="showTool('ipTool')">
+          Use Tool
+        </button>
+      </div>
+    </div>
+    <div class="tool-card">
+      <div
+        class="tool-card-header"
+        style="background: linear-gradient(45deg, #ff6a00, #ee0979)"
+      >
+        <i class="tool-icon fas fa-sitemap"></i>
+      </div>
+      <div class="tool-card-body">
+        <h3>Domain Extractor</h3>
+        <p>Extract all domains.</p>
+        <button class="use-tool-button" onclick="showTool('domainTool')">
+          Use Tool
+        </button>
+      </div>
+    </div>
+    <div class="tool-card">
+      <div
+        class="tool-card-header"
+        style="background: linear-gradient(45deg, #00b09b, #96c93d)"
+      >
+        <i class="tool-icon fas fa-link"></i>
+      </div>
+      <div class="tool-card-body">
+        <h3>Domain-IP</h3>
+        <p>Extract  IPs by domain.</p>
+        <button class="use-tool-button" onclick="showTool('domainIpTool')">
+          Use Tool
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="ipIdTool" class="tool-section">
+    <div class="back-link" onclick="hideAll()">← Back to Tools</div>
+    <h3>IP and ID Extractor</h3>
+    <div class="textarea-group">
+      <textarea id="inputIpId"></textarea>
+      <textarea id="outputIpId" readonly></textarea>
+    </div>
+    <div class="button-row">
+      <button onclick="copyOutput('outputIpId')">Copy Output</button>
+      <button onclick="clearFields('ipIdTool')">Clear All</button>
+    </div>
+  </div>
+
+  <div id="ipTool" class="tool-section">
+    <div class="back-link" onclick="hideAll()">← Back to Tools</div>
+    <h3>IP Extractor</h3>
+    <div class="textarea-group">
+      <textarea id="inputIP"></textarea>
+      <textarea id="outputIP" readonly></textarea>
+    </div>
+    <div class="button-row">
+      <button onclick="copyOutput('outputIP')">Copy Output</button>
+      <button onclick="clearFields('ipTool')">Clear All</button>
+    </div>
+  </div>
+
+  <div id="domainTool" class="tool-section">
+    <div class="back-link" onclick="hideAll()">← Back to Tools</div>
+    <h3>Domain Extractor</h3>
+    <div class="textarea-group">
+      <textarea id="inputDomain"></textarea>
+      <textarea id="outputDomain" readonly></textarea>
+    </div>
+    <div class="button-row">
+      <button onclick="copyOutput('outputDomain')">Copy Output</button>
+      <button onclick="clearFields('domainTool')">Clear All</button>
+    </div>
+  </div>
+
+  <div id="domainIpTool" class="tool-section">
+    <div class="back-link" onclick="hideAll()">← Back to Tools</div>
+    <h3>Domain-IP </h3>
+    <div class="textarea-group">
+      <textarea id="inputDomainIP"></textarea>
+      <textarea id="outputDomainIP" readonly></textarea>
+    </div>
+    <div class="button-row">
+      <button onclick="copyOutput('outputDomainIP')">Copy Output</button>
+      <button onclick="clearFields('domainIpTool')">Clear All</button>
+    </div>
+  </div>
+
+  <script>
+    function hideAll() {
+      document.querySelectorAll(".tool-section").forEach((el) => {
+        el.style.display = "none";
+        el.querySelectorAll("textarea").forEach((t) => (t.value = ""));
+      });
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function showTool(id) {
+      hideAll();
+      document.getElementById(id).style.display = "block";
+      document.getElementById(id).scrollIntoView({ behavior: "smooth" });
+    }
+
+    document.getElementById("inputIpId").addEventListener("input", () => {
+      const text = document.getElementById("inputIpId").value;
+      const pattern = /\b(\d{1,3}(?:\.\d{1,3}){3})\s+(\d{6,})/g;
+      const map = {};
+      let match;
+      while ((match = pattern.exec(text)) !== null) {
+        const [_, ip, id] = match;
+        if (!map[id]) map[id] = new Set();
+        map[id].add(ip);
+      }
+      let result = "";
+      for (const id in map) {
+        result += id + "\n" + [...map[id]].join("\n") + "\n\n";
+      }
+      document.getElementById("outputIpId").value = result.trim();
+    });
+
+    document.getElementById("inputIP").addEventListener("input", () => {
+      const text = document.getElementById("inputIP").value;
+      const ipPattern = /\b\d{1,3}(?:\.\d{1,3}){3}\b/g;
+      const matches = text.match(ipPattern);
+      document.getElementById("outputIP").value = matches
+        ? [...new Set(matches)].join("\n")
+        : "";
+    });
+
+    document.getElementById("inputDomain").addEventListener("input", () => {
+      const text = document.getElementById("inputDomain").value;
+      const domainPattern = /\b(?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,}\b/g;
+      const matches = text.match(domainPattern);
+      document.getElementById("outputDomain").value = matches
+        ? [...new Set(matches)].join("\n")
+        : "";
+    });
+
+    document.getElementById("inputDomainIP").addEventListener("input", () => {
+      const text = document.getElementById("inputDomainIP").value;
+      const lines = text.split(/\r?\n/);
+      let result = "";
+      let group = [];
+      for (const line of lines) {
+        const ipMatch = line.match(/\b\d{1,3}(?:\.\d{1,3}){3}\b/);
+        if (ipMatch) {
+          group.push(ipMatch[0]);
+        } else if (line.trim().toLowerCase() === "domain") {
+          if (group.length > 0) {
+            result += "domain\n" + group.join("\n") + "\n\n";
+            group = [];
+          }
+        }
+      }
+      if (group.length > 0) {
+        result += "domain\n" + group.join("\n");
+      }
+      document.getElementById("outputDomainIP").value = result.trim();
+    });
+
+    function copyOutput(outputId) {
+      const output = document.getElementById(outputId);
+      if (!output.value) return; // silently ignore empty output
+      navigator.clipboard.writeText(output.value).then(() => {
+        const button = document
+          .getElementById(outputId)
+          .parentElement.nextElementSibling.querySelector("button:first-child");
+        if (!button) return;
+        const originalText = button.textContent;
+        button.textContent = "Copied!";
+        button.disabled = true;
+        setTimeout(() => {
+          button.textContent = originalText;
+          button.disabled = false;
+        }, 1500);
+      });
+    }
+
+    function clearFields(toolSectionId) {
+      const section = document.getElementById(toolSectionId);
+      if (!section) return;
+      section.querySelectorAll("textarea").forEach((t) => (t.value = ""));
+    }
+  </script>
+</body>
+</html>
