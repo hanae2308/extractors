@@ -136,47 +136,39 @@
   </style>
 </head>
 <body>
-  <h1> Extractors</h1>
+  <h1>Extractors</h1>
 
   <div class="tool-grid">
-    <div class="tool-card">
-      <h3>IP and ID Extractor</h3>
-      <p>Extract IPs by associated IDs</p>
-      <button onclick="showTool('ipIdTool')">Use Tool</button>
-    </div>
-    
+    <!-- 1. IP Extractor -->
     <div class="tool-card">
       <h3>IP Address Extractor</h3>
       <p>Extract all IP addresses</p>
       <button onclick="showTool('ipTool')">Use Tool</button>
     </div>
     
+    <!-- 2. Domain Extractor -->
     <div class="tool-card">
       <h3>Domain Extractor</h3>
       <p>Extract all domains</p>
       <button onclick="showTool('domainTool')">Use Tool</button>
     </div>
     
+    <!-- 3. Domain-IP Extractor -->
     <div class="tool-card">
       <h3>Domain-IP Extractor</h3>
       <p>Extract IPs by domain</p>
       <button onclick="showTool('domainIpTool')">Use Tool</button>
     </div>
-  </div>
-
-  <div id="ipIdTool" class="tool-section">
-    <div class="back-link" onclick="hideAll()">← Back to all tools</div>
-    <h3>IP and ID Extractor</h3>
-    <div class="textarea-group">
-      <textarea id="inputIpId" placeholder="Paste text containing IPs and IDs here..."></textarea>
-      <textarea id="outputIpId" placeholder="Results will appear here..." readonly></textarea>
-    </div>
-    <div class="button-group">
-      <button onclick="copyOutput('outputIpId')">Copy Output</button>
-      <button onclick="clearFields('ipIdTool')">Clear All</button>
+    
+    <!-- 4. IP and ID Extractor -->
+    <div class="tool-card">
+      <h3>IP and ID Extractor</h3>
+      <p>Extract IPs by associated IDs</p>
+      <button onclick="showTool('ipIdTool')">Use Tool</button>
     </div>
   </div>
 
+  <!-- 1. IP Extractor Section -->
   <div id="ipTool" class="tool-section">
     <div class="back-link" onclick="hideAll()">← Back to all tools</div>
     <h3>IP Extractor</h3>
@@ -190,6 +182,7 @@
     </div>
   </div>
 
+  <!-- 2. Domain Extractor Section -->
   <div id="domainTool" class="tool-section">
     <div class="back-link" onclick="hideAll()">← Back to all tools</div>
     <h3>Domain Extractor</h3>
@@ -203,6 +196,7 @@
     </div>
   </div>
 
+  <!-- 3. Domain-IP Extractor Section -->
   <div id="domainIpTool" class="tool-section">
     <div class="back-link" onclick="hideAll()">← Back to all tools</div>
     <h3>Domain-IP Extractor</h3>
@@ -213,6 +207,20 @@
     <div class="button-group">
       <button onclick="copyOutput('outputDomainIP')">Copy Output</button>
       <button onclick="clearFields('domainIpTool')">Clear All</button>
+    </div>
+  </div>
+
+  <!-- 4. IP and ID Extractor Section -->
+  <div id="ipIdTool" class="tool-section">
+    <div class="back-link" onclick="hideAll()">← Back to all tools</div>
+    <h3>IP and ID Extractor</h3>
+    <div class="textarea-group">
+      <textarea id="inputIpId" placeholder="Paste text containing IPs and IDs here..."></textarea>
+      <textarea id="outputIpId" placeholder="Results will appear here..." readonly></textarea>
+    </div>
+    <div class="button-group">
+      <button onclick="copyOutput('outputIpId')">Copy Output</button>
+      <button onclick="clearFields('ipIdTool')">Clear All</button>
     </div>
   </div>
 
@@ -266,27 +274,20 @@
         : "";
     });
 
-     document.getElementById("inputDomainIP").addEventListener("input", () => {
-    const text = document.getElementById("inputDomainIP").value;
-    const lines = text.split(/\r?\n/);
-    let result = "";
-    
-    // New pattern to match IP and domain in your specific format
-    const pattern = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s+([a-zA-Z0-9-]+\.com)/g;
-    
-    // Find all matches in the text
-    const matches = [...text.matchAll(pattern)];
-    
-    // Process each match
-    matches.forEach(match => {
-      const ip = match[1];
-      const domain = match[2];
-      result += `${domain}\n${ip}\n\n`;
+    document.getElementById("inputDomainIP").addEventListener("input", () => {
+      const text = document.getElementById("inputDomainIP").value;
+      const pattern = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s+([a-zA-Z0-9-]+\.com)/g;
+      const matches = [...text.matchAll(pattern)];
+      let result = "";
+      
+      matches.forEach(match => {
+        const ip = match[1];
+        const domain = match[2];
+        result += `${domain}\n${ip}\n\n`;
+      });
+
+      document.getElementById("outputDomainIP").value = result.trim();
     });
-
-    document.getElementById("outputDomainIP").value = result.trim();
-  });
-
 
     function copyOutput(outputId) {
       const output = document.getElementById(outputId);
