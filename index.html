@@ -266,27 +266,27 @@
         : "";
     });
 
-    document.getElementById("inputDomainIP").addEventListener("input", () => {
-      const text = document.getElementById("inputDomainIP").value;
-      const lines = text.split(/\r?\n/);
-      let result = "";
-      let group = [];
-      for (const line of lines) {
-        const ipMatch = line.match(/\b\d{1,3}(?:\.\d{1,3}){3}\b/);
-        if (ipMatch) {
-          group.push(ipMatch[0]);
-        } else if (line.trim().toLowerCase() === "domain") {
-          if (group.length > 0) {
-            result += "domain\n" + group.join("\n") + "\n\n";
-            group = [];
-          }
-        }
-      }
-      if (group.length > 0) {
-        result += "domain\n" + group.join("\n");
-      }
-      document.getElementById("outputDomainIP").value = result.trim();
+     document.getElementById("inputDomainIP").addEventListener("input", () => {
+    const text = document.getElementById("inputDomainIP").value;
+    const lines = text.split(/\r?\n/);
+    let result = "";
+    
+    // New pattern to match IP and domain in your specific format
+    const pattern = /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s+([a-zA-Z0-9-]+\.com)/g;
+    
+    // Find all matches in the text
+    const matches = [...text.matchAll(pattern)];
+    
+    // Process each match
+    matches.forEach(match => {
+      const ip = match[1];
+      const domain = match[2];
+      result += `${domain}\n${ip}\n\n`;
     });
+
+    document.getElementById("outputDomainIP").value = result.trim();
+  });
+
 
     function copyOutput(outputId) {
       const output = document.getElementById(outputId);
