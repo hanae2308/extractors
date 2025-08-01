@@ -262,22 +262,33 @@
     }
 
     // IP and ID Extractor
-    document.getElementById("inputIpId").addEventListener("input", () => {
-      const text = document.getElementById("inputIpId").value;
-      const pattern = /\b(\d{1,3}(?:\.\d{1,3}){3})\s+(\d{6,})/g;
-      const map = {};
-      let match;
-      while ((match = pattern.exec(text)) !== null) {
-        const [_, ip, id] = match;
-        if (!map[id]) map[id] = new Set();
-        map[id].add(ip);
-      }
-      let result = "";
-      for (const id in map) {
-        result += id + "\n" + [...map[id]].join("\n") + "\n\n";
-      }
-      document.getElementById("outputIpId").value = result.trim();
+   document.getElementById("inputIpId").addEventListener("input", function() {
+    const text = this.value;
+    const pattern = /Crazy Train (\d+).*? - (\d+\.\d+\.\d+\.\d+)/gs;
+    const matches = [...text.matchAll(pattern)];
+    const idMap = {};
+    
+    // Organize data by ID
+    matches.forEach(match => {
+        const id = match[1];
+        const ip = match[2];
+        
+        if (!idMap[id]) {
+            idMap[id] = new Set();
+        }
+        idMap[id].add(ip);
     });
+    
+    // Format the output
+    let result = "";
+    for (const [id, ips] of Object.entries(idMap)) {
+        result += `${id}\n`;
+        result += Array.from(ips).join('\n');
+        result += '\n\n';
+    }
+    
+    document.getElementById("outputIpId").value = result.trim();
+});
 
     // IP Extractor
     document.getElementById("inputIP").addEventListener("input", () => {
